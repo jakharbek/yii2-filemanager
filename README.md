@@ -260,7 +260,16 @@ echo jakharbek\filemanager\widgets\InputWidget::widget([
     public $video_ext = ['mp4','flv'];
 
 ```
-
+Rules
+----
+```php
+public function rules()
+    {
+        return [ 
+            [['postsimagespostersdata'], 'safe']],
+         ];
+    }
+```
 Использованеи без связуюешей таблице
 ----
 Через InputWidget
@@ -305,4 +314,21 @@ echo jakharbek\filemanager\widgets\InputWidget::widget([
                 'preset' => 'full'
             ]) ?>
 
+```
+
+
+
+Фото не найдено
+----
+Вам нужно создать параметр:
+```php
+no_photo
+```
+и указать id файла
+
+пример
+```php
+[
+'no_photo' => 321
+];
 ```
