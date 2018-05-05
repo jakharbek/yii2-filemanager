@@ -79,7 +79,7 @@ class InputWidget extends Widget{
      */
     public $video_ext = ['mp4','flv'];
 
-    private $selected = [];
+    private $selected = "";
     private $file_id_css = "file-";
     private $model_id = "";
     private $model_class = "";

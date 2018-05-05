@@ -21,7 +21,8 @@ class m180217_101045_create_files_table extends Migration
             '[[params]]' => $this->string(255)->comment('Параметры'),
             '[[date_create]]' => $this->integer(255)->notNull()->comment('Дата добавление'),
             '[[converted]]' => $this->integer(255)->notNull()->defaultValue(0)->comment('Конвертировано'),
-            '[[user_id]]' => $this->integer(255)->comment('Пользователь')
+            '[[user_id]]' => $this->integer(255)->comment('Пользователь'),
+            '[[params]]' => $this->text()->comment('Параметры')
         ]);
 
         /*
