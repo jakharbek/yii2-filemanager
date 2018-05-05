@@ -1,0 +1,30 @@
+{
+    "name": "jakharbek/yii2-filemanager",
+    "description": "File Manager",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","filemanager"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "jakharbek",
+            "email": "javhar_work@mail.ru"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0",
+        "yiisoft/yii2-imagine": "~2.1.0",
+        "kartik-v/yii2-widget-datetimepicker": "*",
+        "kartik-v/yii2-sortable-input": "*",
+        "kartik-v/yii2-sortable": "*",
+        "kartik-v/yii2-editable": "*",
+        "kartik-v/yii2-date-range": "*",
+        "kartik-v/yii2-widget-select2": "@dev",
+        "kartik-v/bootstrap-fileinput": "dev-master",
+        "jakharbek/yii2-core" : "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "jakharbek\\filemanager\\": "src"
+        }
+    }
+}
