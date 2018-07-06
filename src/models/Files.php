@@ -226,6 +226,11 @@ class Files extends \yii\db\ActiveRecord
     public function upload(){
         
         $file_hash = Yii::$app->security->generateRandomString(50);
+
+        $data_file = self::parse($file_hash);
+        $folder = $data_file['folder'];
+        $file_name = $data_file['file'];
+
         $this->title = $this->file_data->baseName;
         $this->description = $this->file_data->baseName;
         $this->type = $this->file_data->extension;
@@ -234,8 +239,12 @@ class Files extends \yii\db\ActiveRecord
 
 
         if ($this->validate()) {
-            $dist = Yii::getAlias($this->upload_dir. $file_hash);
+            $dist = self::dist($this->upload_dir,$file_hash);
             $ext = $this->file_data->extension;
+            $folder_dist = Yii::getAlias($this->getUpload_dir().$folder);
+            if(!is_dir($folder_dist)){
+                mkdir($folder_dist);
+            }
             /**
              * Alternative ext
              */
@@ -279,7 +288,7 @@ class Files extends \yii\db\ActiveRecord
      * @return string
      */
     public function getSrc(){
-        $dist = Yii::getAlias($this->upload_dir_src.$this->file);
+        $dist = self::dist($this->upload_dir_src,$this->file);
         $origin = $dist.".".$this->type;
         return $origin;
     }
@@ -289,8 +298,8 @@ class Files extends \yii\db\ActiveRecord
      * @return string
      */
     public function src($thumb = null){
-        $dist = Yii::getAlias($this->upload_dir.$this->file);
-        $dist_src = Yii::getAlias($this->upload_dir_src.$this->file);
+        $dist = self::dist($this->upload_dir,$this->file);
+        $dist_src = self::dist($this->upload_dir_src,$this->file);
         $origin = $dist.".".$this->type;
         $origin_src = $dist_src.".".$this->type;
         if($this->isImage){
@@ -329,7 +338,7 @@ class Files extends \yii\db\ActiveRecord
      */
     public function afterDelete(){
 
-            $dist = Yii::getAlias($this->upload_dir . $this->file);
+            $dist = self::dist($this->upload_dir , $this->file);
             $ext = $this->type;
             $origin = $dist . "." . $ext;
             unlink($origin);
@@ -385,8 +394,8 @@ class Files extends \yii\db\ActiveRecord
      */
     public function getThumbs(){
         if($this->isImage){
-            $dist = Yii::getAlias($this->upload_dir.$this->file);
-            $dist_src = Yii::getAlias($this->upload_dir_src.$this->file);
+            $dist = self::dist($this->upload_dir,$this->file);
+            $dist_src = self::dist($this->upload_dir_src,$this->file);
             $origin = $dist.".".$this->type;
             $origin_src = $dist_src.".".$this->type;
             $thumbs = $this->thumbs($dist,$this->type,$dist_src);
@@ -425,15 +434,22 @@ class Files extends \yii\db\ActiveRecord
      */
     public function createThumbs($origin,$dist,$ext){
         $thumbs = $this->thumbs($dist,$ext);
+
         foreach ($thumbs as $thumb){
-            // frame, rotate and save an image
+
             $w = $thumb['w'];
             $h = $thumb['h'];
             $d = $thumb['d'];
             $q = $thumb['q'];
+
             if(file_exists($d)){continue;}
-            Image::thumbnail($origin, $w, $h)
-                ->save(Yii::getAlias($d), ['quality' => $q]);
+            $img = Image::getImagine()->open(Yii::getAlias($origin));
+            $size = $img->getSize();
+            $ratio = $size->getWidth()/$size->getHeight();
+            $width = $w;
+            $height = round($width/$ratio);
+
+            Image::thumbnail($origin, $width, $height)->save(Yii::getAlias($d), ['quality' => $q]);
         }
     }
 
@@ -519,7 +535,7 @@ class Files extends \yii\db\ActiveRecord
     public static function convertFileByID($file_id = null){
         if(Files::find()->where(['file_id' => $file_id])->count() == 0){return false;}
         $file = Files::findOne($file_id);
-        $dist = Yii::getAlias(Files::getUpload_dir(). $file->file);
+        $dist = self::dist(Files::getUpload_dir(), $file->file);
         $ext = $file->type;
         $origin = $dist . '.' . $ext;
         self::createQualityVideos($origin,$dist,$ext,$file->file);
@@ -641,8 +657,34 @@ class Files extends \yii\db\ActiveRecord
     public static function no_photo(){
         return Files::findOne(Yii::$app->params['no_photo']);
     }
+
+    /**
+     * @return mixed
+     */
     public static function no_photo_src(){
         return self::no_photo()->src;
+    }
+
+    /**
+     * @param $dir
+     * @param $filename
+     * @return bool|string
+     */
+    public static function dist($dir,$filename){
+        $data = self::parse($filename);
+        $file = $data['file'];
+        $folder = $data['folder'];
+        return Yii::getAlias($dir.$folder."/".$file);
+    }
+
+    /**
+     * @param null $filename
+     * @return array
+     */
+    public static function parse($filename = null){
+        $folder = mb_substr($filename,0,2);
+        $file = mb_substr($filename,2);
+        return ['file' => $file,'folder' => $folder];
     }
 
 }
