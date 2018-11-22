@@ -11,6 +11,7 @@ use FFMpeg\Coordinate\FrameRate;
 use FFMpeg\Coordinate\TimeCode;
 use \FFMpeg\FFMpeg;
 use yii\web\UploadedFile;
+use yii\helpers\ArrayHelper;
 
 /**
  * .:[|]:.
