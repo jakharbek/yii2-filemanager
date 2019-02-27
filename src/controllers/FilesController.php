@@ -13,13 +13,13 @@ use yii\web\UploadedFile;
 use yii\widgets\ListView;
 
 /**
- FilesController implements the CRUD actions for Files model.
-'controllerMap' => [
-                    ...
-                    'files' => 'jakharbek\filemanager\controllers\FilesController'
-                    ...
-],
- Вам нужно подключить это к вашей карте контроллеров приложение
+ * FilesController implements the CRUD actions for Files model.
+ * 'controllerMap' => [
+ * ...
+ * 'files' => 'jakharbek\filemanager\controllers\FilesController'
+ * ...
+ * ],
+ * Вам нужно подключить это к вашей карте контроллеров приложение
  */
 class FilesController extends Controller
 {
@@ -30,9 +30,9 @@ class FilesController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST','GET'],
+                    'delete' => ['POST', 'GET'],
                 ],
             ],
         ];
@@ -48,7 +48,7 @@ class FilesController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -133,25 +133,28 @@ class FilesController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
     public function getViewPath()
     {
         return Yii::getAlias('@vendor/jakharbek/yii2-filemanager/src/views/files');
     }
 
-    public function actionUploads(){
+    public function actionUploads()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $keys = array_keys($_FILES);
-        if(!count($keys)){return false;}
+        if (!count($keys)) {
+            return false;
+        }
         $response = [];
         foreach ($keys as $key):
-            $files = UploadedFile::getInstancesByName( $key);
-            if(count($files))
-            {
+            $files = UploadedFile::getInstancesByName($key);
+            if (count($files)) {
                 foreach ($files as $file):
                     $model = new Files();
                     $model->file_data = $file;
                     $model->save();
-                    if($model->hasErrors()):
+                    if ($model->hasErrors()):
                         $response[] = $model->getErrors();
                     endif;
                 endforeach;
@@ -159,17 +162,18 @@ class FilesController extends Controller
         endforeach;
         return $response;
     }
-    public function actionList($page = 1,$q = null,$id_model = null,$class_model = "",$relation_name = ""){
+
+    public function actionList($page = 1, $q = null, $id_model = null, $class_model = "", $relation_name = "")
+    {
 
         $searchModel = new FilesSearch();
-        if(Yii::$app->request->isPost)
-        {
+        if (Yii::$app->request->isPost) {
             $q = Yii::$app->request->post('q');
         }
         $searchModel->title = $q;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 9;
-        $dataProvider->pagination->page = $page-1;
+        $dataProvider->pagination->page = $page - 1;
         $dataProvider->sort = [
             'defaultOrder' => [
                 'date_create' => SORT_DESC,
@@ -177,32 +181,35 @@ class FilesController extends Controller
         ];
         $dataProvider->refresh();
 
-        if(Yii::$app->request->isPost)
-        {
+        if (Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['pageTotal' => ceil($dataProvider->getTotalCount()/$dataProvider->pagination->pageSize)];
+            return ['pageTotal' => ceil($dataProvider->getTotalCount() / $dataProvider->pagination->pageSize)];
         }
-        if(strlen($class_model) > 0):
+        if (strlen($class_model) > 0):
             $class_model = base64_decode($class_model);
         endif;
-        if(!$id_model){
+        if (!$id_model) {
             $data = [];
-        }else{
+        } else {
             $data = $class_model::findOne($id_model);
         }
         $selected = [];
-        if(count($data->{$relation_name})){
-            foreach ($data->{$relation_name} as $itemdata){
-                $selected[] = $itemdata->file_id;
+        if (is_array($data->{$relation_name})):
+            if (count($data->{$relation_name})) {
+                foreach ($data->{$relation_name} as $itemdata) {
+                    $selected[] = $itemdata->file_id;
+                }
             }
-        }
-        if(Yii::$app->request->isAjax):
-            return $this->renderAjax('_list',['dataProvider' => $dataProvider,'data' => $data,'selected' => $selected,'relation_name' => $relation_name]);
+        endif;
+        if (Yii::$app->request->isAjax):
+            return $this->renderAjax('_list', ['dataProvider' => $dataProvider, 'data' => $data, 'selected' => $selected, 'relation_name' => $relation_name]);
         else:
-            return $this->render('_list',['dataProvider' => $dataProvider,'data' => $data,'selected' => $selected,'relation_name' => $relation_name]);
+            return $this->render('_list', ['dataProvider' => $dataProvider, 'data' => $data, 'selected' => $selected, 'relation_name' => $relation_name]);
         endif;
     }
-    public function actionRemove(){
+
+    public function actionRemove()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $id = Yii::$app->request->post('id');
         $data = $this->findModel($id)->delete();
@@ -210,3 +217,4 @@ class FilesController extends Controller
     }
 
 }
+
