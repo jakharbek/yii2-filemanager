@@ -12,9 +12,9 @@
   ],
   "require": {
     "yiisoft/yii2": "~2.0.0",
-    "kartik-v/yii2-sortable-input": "dev-master",
-    "kartik-v/yii2-editable": "@dev",
-    "kartik-v/yii2-widget-fileinput": "dev-master",
+    "kartik-v/yii2-sortable-input": "v1.2.1",
+    "kartik-v/yii2-editable": "v1.7.8",
+    "kartik-v/yii2-widget-fileinput": "v1.0.9",
     "2amigos/yii2-ckeditor-widget": "^2.1",
     "yiisoft/yii2-imagine": "~2.1.0",
     "yiisoft/yii2-queue": "^2.0",
