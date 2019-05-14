@@ -240,5 +240,5 @@ There is one method that you will often use in my opinion:`FileManagerHelper::ge
 API
 -----------
 The extension has an API, you can connect it and get access to the file manager via the API 
-`jakharbek\filemanager\api\FileManagerController` <br />
+`jakharbek\filemanager\api\FilesController` <br />
 If you need an action of this controller, you can use them by looking at the action method of this class.
