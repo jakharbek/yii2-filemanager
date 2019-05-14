@@ -101,10 +101,10 @@ Params
  
  Apply DI (dependency injection)
  -----
-There is a class `\jakharbek\filemanager\bootstrap\setUp` you need to apply it to the initial download of the application as an example.
+There is a class `\jakharbek\filemanager\bootstrap\SetUp` you need to apply it to the initial download of the application as an example.
 ```php
 'bootstrap' => [
-    \jakharbek\filemanager\bootstrap\setUp::class
+    \jakharbek\filemanager\bootstrap\SetUp::class
 ],
 ```
  

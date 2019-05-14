@@ -10,7 +10,7 @@ use jakharbek\filemanager\repositories\FileRepository;
 use jakharbek\filemanager\services\FileService;
 use yii\base\BootstrapInterface;
 
-class setUp implements BootstrapInterface
+class SetUp implements BootstrapInterface
 {
     /**
      * @param \yii\base\Application $app
