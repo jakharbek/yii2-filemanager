@@ -9,13 +9,33 @@ namespace jakharbek\filemanager\models;
  */
 class FilesQuery extends \yii\db\ActiveQuery
 {
-    /*public function active()
-    {
-        return $this->andWhere('[[status]]=1');
-    }*/
 
     /**
-     * @inheritdoc
+     * @return mixed
+     */
+    public function active()
+    {
+        return $this->andWhere('[[status]]='.Files::STATUS_ACTIVE);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function inactive()
+    {
+        return $this->andWhere('[[status]]='.Files::STATUS_INACTIVE);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function deleted()
+    {
+        return $this->andWhere('[[status]]='.Files::STATUS_DELETED);
+    }
+
+    /**
+     * {@inheritdoc}
      * @return Files[]|array
      */
     public function all($db = null)
@@ -24,7 +44,7 @@ class FilesQuery extends \yii\db\ActiveQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      * @return Files|array|null
      */
     public function one($db = null)

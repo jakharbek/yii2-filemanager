@@ -1,0 +1,61 @@
+.file-manager-modal-header {
+    display: flex;
+    align-items: center;
+}
+
+.file-manager-thumbnail-data {
+    width: 100%;
+    height: 250px;
+    display: block;
+    background-color: white;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.file-manager-buttons {
+    position: absolute;
+    top: 10px;
+    left: 30px;
+}
+
+.file-manager-title {
+    text-align: justify;
+    color: black;
+}
+
+.file-manager-desc {
+    text-align: justify;
+}
+
+.file-manager-pager-wrapper {
+    width:100%;
+}
+
+
+/**     file input      */
+
+.file-input-item{
+    width: 145px;
+    height: 145px;
+    display: block;
+    background-color: white;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.file-input-btn-modal-bottom{
+    position: absolute;
+    bottom:10px;
+    right:15px;
+}
+
+.file-input-btn-modal-top{
+    position: absolute;
+    top:5px;
+    left:5px;
+}
+.file-input-block{
+    position: relative;
+    min-height:50px;
+}

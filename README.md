@@ -27,308 +27,201 @@ Usage
 
 Once the extension is installed, simply use it in your code by  :
 
-Пример будет на примере постов (Posts)
 
-ещё вам нужно выполнить миграцию
+Migrations
+-----
+You need to do the migration
 
 ```
 yii migrate --migrationPath=@vendor/jakharbek/yii2-filemanager/src/migrations
 ```
 
-Параметры
-----
-Вам нужно создать два параметра в Yii приложение
-Первый относительный путь к папке загрузки файлов
-```
-upload_dir_file
-```
-Пример:
-```php
-@frontend/web/uploads/
-```
-Второй обсолютный путь к папке загрузки файлов
-Пример:
-```
-upload_dir_file_src
-```
+Params
+-----
 
-Пример:
-```php
-http://yoursite.domain/frontend/web/uploads/
-```
-
-
-Контроллер
-----
-Вам нужно подключить контроллер:
-```php
-'controllerMap' => [
-        ...
-        'files' => 'jakharbek\filemanager\controllers\FilesController'
-        ...
-    
-    ],
-
-```
-
-
-Подключение
-----
-
-Через связаную таблицу
-----
-
- 
- Для начало вам нужно связуешая таблица для viaTable и настроить свзяь 
- допустим вам нужно подключить фотки постов и создаете таблицу
+ You need to add parameters to the application in the file.
+ example
  ```php
- postsimagespasters
+ [
+     'thumbs' => [
+         'icon' => [
+             'w' => 50,
+             'h' => 50,
+             'q' => 50,
+             'slug' => 'icon'
+         ],
+         'small' => [
+             'w' => 320,
+             'h' => 320,
+             'q' => 50,
+             'slug' => 'small'
+         ],
+         'low' => [
+             'w' => 640,
+             'h' => 640,
+             'q' => 50,
+             'slug' => 'low'
+         ],
+         'normal' => [
+             'w' => 1024,
+             'h' => 1024,
+             'q' => 50,
+             'slug' => 'normal'
+         ]
+     ],
+     'images_ext' => [
+         'jpg',
+         'png',
+         'bmp',
+         'gif'
+     ],
+     'use_file_name' => true,
+     'use_queue' => false,
+     'file_not_founded' => '14',
+     //'file_not_founded' => 'http://img.domain.loc/files/1.jpg'
+ 
+ ```
+ `thumbs` - thumbnails images
+ <br />
+ `images_ext`  - images ext
+ <br />
+ `use_file_name` - When uploading a file, whether to use the file name in the file download or create a hash
+ <br />
+ `use_queue` - When uploading a file, is it necessary to use a queue to load some photos in the background mode?
+ 
+ Apply DI (dependency injection)
+ -----
+There is a class Johar you need to apply it to the initial download of the application as an example.
+```php
+'bootstrap' => [
+    \jakharbek\filemanager\bootstrap\setUp::class
+],
+```
+ 
+ Ways to use
+ -----
+ There are two ways to use you can use using a relation in a database or a column in a table:
+ 
+  
+ Method use via the relation
+ -----------
+ Suppose you have a junction table for example
+ ```
+ post_image
  ------------------
- post_id*
+ post_id
  file_id
  sort
  -----------------
- * это ваша таблца
- sort - для сортировка
  ```
  
+ And let's say you have the appropriate relational methods in Active Record
  
-Создаёте связь для этой таблицу у вас в главный моделе таблице (Posts)
-
-```php
-    public function getPostsimagesposters()
-    {
-        return $this->hasMany(Postsimagesposter::className(), ['post_id' => 'post_id']);
-    }
-
-    public function getimagesposters()
-    {
-        return $this->hasMany(Files::className(), ['file_id' => 'file_id'])->viaTable('postsimagesposter', ['post_id' => 'post_id']);
-    }
-```
-
-Нужно создать свойство для инпута форму куда будут собираться данные из формы.
-
-```php
-
-class Posts{
-    
-    ...
-    
-    private $_postsimagespostersdata;
-    
-    ...
-    
-    
-    
-    public function getpostsimagespostersdata(){
-        return $this->_postsimagespostersdata;
-    }
-    public function setpostsimagespostersdata($value){
-        return $this->_postsimagespostersdata = $value;
-    }
-
+ ```php
+public function getPostImages()
+{
+    return $this->hasMany(PostImage::className(), ['post_id' => 'post_id']);
 }
  
+public function getImages()
+{
+    return $this->hasMany(Files::className(), ['file_id' => 'file_id'])->viaTable('postImages', ['post_id' => 'post_id']);
+}
+ ```
+ And now you need to apply special behavior `jakharbek\filemanager\behaviors\FileRelationBehavior` for such cases.
+ 
+ For example:
+ 
+ ```php
+ 'file_relation_image' => [
+  'class' => FileRelationBehavior::class,
+  'delimtr' => ',',
+  'attribute' => 'file_image'
+ ],
+ ```
+ 
+ You will need to create a property for exchanging data between the form and the model in case it found `file_image`
+ 
+ ```php
+ public $file_image
+ ```
+ 
+ or
+ 
+ ```php
+ private $_file_image;
+  
+ public function getFileImage(){
+    return $this->$_file_image;
+ }
+ 
+ public function setFileImage($value){
+    return $this->$_file_image = $value;
+ }
+ ```
+ Next, you need to add this property `file_image` to the rules of the model as `safe`.
+ For example:
+ ```php
+ public function rules()
+ {
+    return [ 
+            [['file_image'], 'safe']],
+     ];
+ }
+ ```
+ Now you can apply a file load/upload widget `jakharbek\filemanager\widgets\FileInput` for this field.
+ 
+ For example
+ 
+ ```php
+<?php use \jakharbek\filemanager\widgets\FileInput;?>
+<?= $form->field($model, 'file_image')->widget(FileInput::class,[
+            'id' => 'file_image_id'
+    ]) ?>
+ ```
+ 
+ Use without a junction table
+-----------
+I assume that you already have fields in the table for storing file identifiers there. The type of this column should be a string, since file identifiers will be stored there through a separator for example we have images column for posts table
 
+In this case, you can immediately use the widget without any model settings.
+
+For example:
+```php
+use \jakharbek\filemanager\widgets\FileInput;
+
+echo FileInput::widget(['id' => 'post_images_id']);
 ```
 
 
-Поведение
-----
+Use in CKEditor
+-----------
+To use the plug-in file manager in the editor, you need to specify this plug-in in the settings as shown in the example.
+For example:
 ```php
-use jakharbek\filemanager\behaviors\FileModelBehavior;
-```
-```php
- 'file_manager_model' => [
-                'class' => FileModelBehavior::className(),
-                'attribute' => 'postsimagespostersdata',
-                'relation_name' => 'imagesposters',
-                'delimitr' => ',',
-                'via_table_name' => 'postsimagesposter',
-                'via_table_relation' => 'postsimagesposters',
-                'one_table_column' => 'post_id',
-                'two_table_column' => 'file_id'
+<?php
+    echo $form->field($model, 'description')->widget(CKEditor::className(), [
+        'options' => ['rows' => 6],
+        'clientOptions'=>[
+            'extraPlugins' => 'filemanager-jakhar',
+            'justifyClasses'=>[ 'AlignLeft', 'AlignCenter', 'AlignRight', 'AlignJustify' ],
+            'height'=>200,
+            'toolbarGroups' => [
+                ['name' => 'filemanager-jakhar']
             ],
+        ],
+        'preset' => 'short'
+    ]);
+?>
 ```
 
-информация
+After you need to run once this code to launch a modal window when you click a button in the editor
 
 ```php
-  /**
-     * @var string имя атрибута откуда брать информацию из формы
-     */
-    public $attribute = "postsimagespostersdata";
-    /**
-     * @var string имя свзяи
-     */
-    public $relation_name = "imagesposters";
-    /**
-     * @var string разделителсь информация
-     */
-    public $delimitr = ",";
-    /**
-     * @var string имя связуюший таблице (как в базе данных)
-     */
-    public $via_table_name = "postsimagesposter";
-    /**
-     * @var string имя связи связуюший таблице
-     */
-    public $via_table_relation = "postsimagesposters";
-    /**
-     * @var string имя поля первечного ключа первый таблице
-     */
-    public $one_table_column = "post_id";
-    /**
-     * @var string имя поля первечного ключа первый таблице
-     */
-    public $two_table_column = "file_id";
-
+<?=\jakharbek\filemanager\widgets\FileInput::widget(['id' => 'fileManagerEditor','editor' => true]);?>
 ```
 
-Виджет
-----
-Теперь вы можете подключить виджет для выбера данных.
-
-```php
-echo jakharbek\filemanager\widgets\InputWidget::widget([
-    'model_db' => $model,
-    'form' => $form,
-    'attribute' => 'Posts[postsimagespostersdata]',
-    'id' => 'imagesposters',
-    'relation_name' => 'imagesposters',
-    'via_relation_name' => 'postsimagesposters',
-    'delimitr' => ','
-]);
-```
-
-инфорация
-
-```php
- /**
-     * @var string произволная строка для идентификации
-     */
-    public $id = "filemanager1";
-    /**
-     * @var ActiveForm ваша форма
-     */
-    public $form;
-    /**
-     * @var ActiveRecord ваша модель базы данных.
-     */
-    public $model_db;
-    /**
-     * @var string атрибут формы интупа который будет возврашать запрос по посту
-     *  <input name="атрибут" />
-     */
-    public $attribute;
-    /**
-     * @var string имя действие контроллера если вы его изменили
-     */
-    public $controller = "/files/uploads/";
-    /**
-     * @var string имя действие контроллера если вы его изменили
-     */
-    public $list = "/files/list/";
-    /**
-     * @var string имя действие контроллера если вы его изменили
-     */
-    public $deleteurl = "/files/remove/";
-    /**
-     * @var string разделитель данных;
-     */
-    public $delimitr = ",";
-    /**
-     * @var string имя связи связуешей таблице
-     */
-    public $relation_name = "imagesposters";
-    /**
-     * @var stringи имя связи к таблице связи
-     */
-    public $via_relation_name = "postsimagesposters";
-    /**
-     * @var array имя расшерение для фоток
-     */
-    public $pictures_ext = ['png','jpg','jpeg','gif','bmp'];
-    /**
-     * @var array имя расшерение для аудио
-     */
-    public $music_ext = ['mp3'];
-    /**
-     * @var array имя расшерение для видео
-     */
-    public $video_ext = ['mp4','flv'];
-
-```
-Rules
-----
-```php
-public function rules()
-    {
-        return [ 
-            [['postsimagespostersdata'], 'safe']],
-         ];
-    }
-```
-Использованеи без связуюешей таблице
-----
-Через InputWidget
-
-```php
-\jakharbek\filemanager\widgets\InputModalWidget::widget(['form' => $form,
-                'attribute' => 'files',
-                'id' => 'files_id_asdsdasdsad',
-                'values' => '',
-                'value_encode' => true
-            ]);
-```
-
-
-Использование в CKEditor
-----
-
-```php
-     <?php  echo \jakharbek\filemanager\widgets\ModalWidget::widget(); ?>
-            <?= $form->field($model, 'description')->widget(CKEditor::className(), [
-                'options' => ['rows' => 6],
-                'clientOptions'=>[
-                    'extraPlugins' => 'filemanager-jakhar',
-                    'justifyClasses'=>[ 'AlignLeft', 'AlignCenter', 'AlignRight', 'AlignJustify' ],
-                    'height'=>200,
-                    'toolbarGroups' => [
-                        ['name' => 'filemanager-jakhar']
-                    ],
-                ],
-                'preset' => 'short'
-            ]) ?>
-            <?= $form->field($model, 'content')->widget(CKEditor::className(), [
-                'options' => ['rows' => 6],
-                'clientOptions'=>[
-                    'extraPlugins' => 'filemanager-jakhar',
-                    'justifyClasses'=>[ 'AlignLeft', 'AlignCenter', 'AlignRight', 'AlignJustify' ],
-                    'height'=>200,
-                    'toolbarGroups' => [
-                        ['name' => 'filemanager-jakhar']
-                    ],
-                ],
-                'preset' => 'full'
-            ]) ?>
-
-```
-
-
-
-Фото не найдено
-----
-Вам нужно создать параметр:
-```php
-no_photo
-```
-и указать id файла
-
-пример
-```php
-[
-'no_photo' => 321
-];
-```
+Helpers
+-----------
+You have to help the class jakharbek\filemanager\helpers\FileManagerHelper
+There is one method that you will often use in my opinion:`FileManagerHelper::getFilesById`
