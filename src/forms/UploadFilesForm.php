@@ -5,7 +5,7 @@ namespace jakharbek\filemanager\forms;
 use jakharbek\filemanager\dto\FileSaveDTO;
 use jakharbek\filemanager\dto\FileUploadDTO;
 use jakharbek\filemanager\helpers\FileManagerHelper;
-use jakharbek\filemanager\services\FileManagerServices;
+use jakharbek\filemanager\services\FileService;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -34,11 +34,11 @@ class UploadFilesForm extends Model
 
     /**
      * @return bool
-     * @throws \jakharbek\filemanager\exceptions\FileManagerExceptions
+     * @throws \jakharbek\filemanager\exceptions\FileException
      */
     public function upload()
     {
-        $service = new FileManagerServices();
+        $service = new FileService();
 
         if (!$this->validate()) {
             return false;

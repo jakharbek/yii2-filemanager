@@ -2,12 +2,12 @@
 
 namespace jakharbek\filemanager\bootstrap;
 
-use jakharbek\filemanager\factories\FileManagerFactory;
-use jakharbek\filemanager\interfaces\iFileManagerFactory;
-use jakharbek\filemanager\interfaces\iFileManagerRepository;
-use jakharbek\filemanager\interfaces\iFileManagerServices;
-use jakharbek\filemanager\repositories\FileManagerRepository;
-use jakharbek\filemanager\services\FileManagerServices;
+use jakharbek\filemanager\factories\FileFactory;
+use jakharbek\filemanager\interfaces\FileFactoryInterface;
+use jakharbek\filemanager\interfaces\FileRepositoryInterface;
+use jakharbek\filemanager\interfaces\FileServiceInterface;
+use jakharbek\filemanager\repositories\FileRepository;
+use jakharbek\filemanager\services\FileService;
 use yii\base\BootstrapInterface;
 
 class setUp implements BootstrapInterface
@@ -17,11 +17,10 @@ class setUp implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-
         $container = \Yii::$container;
-        $container->set(iFileManagerServices::class, FileManagerServices::class);
-        $container->set(iFileManagerRepository::class, FileManagerRepository::class);
-        $container->set(iFileManagerFactory::class, FileManagerFactory::class);
+        $container->set(FileServiceInterface::class, FileService::class);
+        $container->set(FileRepositoryInterface::class, FileRepository::class);
+        $container->set(FileFactoryInterface::class, FileFactory::class);
     }
 
 }

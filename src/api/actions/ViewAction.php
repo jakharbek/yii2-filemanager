@@ -2,9 +2,9 @@
 
 namespace jakharbek\filemanager\api\actions;
 
-use jakharbek\filemanager\interfaces\iFileManagerRepository;
-use Yii;
+use jakharbek\filemanager\interfaces\fileRepositoryInterface;
 use yii\base\Action;
+use yii\base\Controller;
 
 /**
  * Class ViewAction
@@ -13,6 +13,17 @@ use yii\base\Action;
 class ViewAction extends Action
 {
     /**
+     * @var fileRepositoryInterface
+     */
+    private $fileRepository;
+
+    public function __construct(string $id, Controller $controller, FileRepositoryInterface $fileRepository, array $config = [])
+    {
+        parent::__construct($id, $controller, $config);
+        $this->fileRepository = $fileRepository;
+    }
+
+    /**
      * @param $id
      * @return \jakharbek\filemanager\models\Files|null
      * @throws \yii\base\InvalidConfigException
@@ -20,11 +31,6 @@ class ViewAction extends Action
      */
     public function run($id)
     {
-        /**
-         * @var $repository iFileManagerRepository
-         */
-        $repository = Yii::$container->get(iFileManagerRepository::class);
-
-        return $repository->getById($id);
+        return $this->fileRepository->getById($id);
     }
 }

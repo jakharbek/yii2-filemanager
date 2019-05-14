@@ -4,7 +4,7 @@ namespace jakharbek\filemanager\exceptions;
 
 use yii\base\Exception;
 
-class FileManagerExceptions extends Exception
+class FileException extends Exception
 {
 
 }

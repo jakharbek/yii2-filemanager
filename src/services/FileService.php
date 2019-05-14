@@ -8,11 +8,11 @@ use jakharbek\filemanager\dto\FileUploadDTO;
 use jakharbek\filemanager\dto\FileUploadedDTO;
 use jakharbek\filemanager\dto\GeneratedPathFileDTO;
 use jakharbek\filemanager\dto\GeneratePathFileDTO;
-use jakharbek\filemanager\exceptions\FileManagerExceptions;
+use jakharbek\filemanager\exceptions\FileException;
 use jakharbek\filemanager\helpers\FileManagerHelper;
-use jakharbek\filemanager\interfaces\iFileManagerFactory;
-use jakharbek\filemanager\interfaces\iFileManagerServices;
-use jakharbek\filemanager\jobs\createThumbsImageJob;
+use jakharbek\filemanager\interfaces\FileFactoryInterface;
+use jakharbek\filemanager\interfaces\FileServiceInterface;
+use jakharbek\filemanager\jobs\createThumbnailsJob;
 use jakharbek\filemanager\models\Files;
 use Yii;
 use yii\helpers\Inflector;
@@ -23,7 +23,7 @@ use yii\web\UploadedFile;
  * Class FileManagerServices
  * @package jakharbek\filemanager\services
  */
-class FileManagerServices implements iFileManagerServices
+class FileService implements FileServiceInterface
 {
     /**
      * @param FileUploadDTO $fileUploadDTO
@@ -36,13 +36,13 @@ class FileManagerServices implements iFileManagerServices
          */
         $files = $fileUploadDTO->files;
         if (count($files) == 0) {
-            throw new FileManagerExceptions("Files is empty for uploading");
+            throw new FileException("Files is empty for uploading");
         }
         $fileUploadedDTO = new FileUploadedDTO();
 
         foreach ($files as $file) {
             if (!($file instanceof UploadedFile)) {
-                throw new FileManagerExceptions("File object is not instanceof UploadedFile class");
+                throw new FileException("File object is not instanceof UploadedFile class");
             }
 
             $generatePathDTO = new GeneratePathFileDTO();
@@ -157,9 +157,9 @@ class FileManagerServices implements iFileManagerServices
     public function save(FileUploadedDTO $fileUploadedDTO, FileSaveDTO $fileSaveDTO): ?array
     {
         /**
-         * @var $factory iFileManagerFactory
+         * @var $factory fileFactoryInterface
          */
-        $factory = Yii::$container->get(iFileManagerFactory::class);
+        $factory = Yii::$container->get(fileFactoryInterface::class);
 
         $files = $fileUploadedDTO->uploadedFiles;
 
@@ -198,7 +198,7 @@ class FileManagerServices implements iFileManagerServices
             $createdFiles[$fileModel->id] = $fileModel;
 
             if(FileManagerHelper::useQueue()){
-                Yii::$app->queue->push(new createThumbsImageJob([
+                Yii::$app->queue->push(new createThumbnailsJob([
                     'file_id' => $fileModel->id
                 ]));
             }else{

@@ -2,14 +2,14 @@
 
 namespace jakharbek\filemanager\repositories;
 
-use jakharbek\filemanager\interfaces\iFileManagerRepository;
+use jakharbek\filemanager\interfaces\FileRepositoryInterface;
 use jakharbek\filemanager\models\Files;
 
 /**
  * Class FileManagerRepository
  * @package jakharbek\filemanager\repositories
  */
-class FileManagerRepository implements iFileManagerRepository
+class FileRepository implements FileRepositoryInterface
 {
 
     /**

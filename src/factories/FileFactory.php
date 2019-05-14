@@ -3,9 +3,9 @@
 namespace jakharbek\filemanager\factories;
 
 use jakharbek\filemanager\dto\FileCreateDTO;
-use jakharbek\filemanager\exceptions\FileManagerExceptions;
-use jakharbek\filemanager\interfaces\iFileManagerFactory;
-use jakharbek\filemanager\interfaces\iFileManagerServices;
+use jakharbek\filemanager\exceptions\FileException;
+use jakharbek\filemanager\interfaces\FileFactoryInterface;
+use jakharbek\filemanager\interfaces\FileServiceInterface;
 use jakharbek\filemanager\models\Files;
 use Yii;
 use yii\base\Component;
@@ -15,7 +15,7 @@ use yii\helpers\Json;
  * Class FileManagerFactory
  * @package jakharbek\filemanager\factories
  */
-class FileManagerFactory extends Component implements iFileManagerFactory
+class FileFactory extends Component implements FileFactoryInterface
 {
     /**
      * @param FileCreateDTO $fileCreateDTO
@@ -24,9 +24,9 @@ class FileManagerFactory extends Component implements iFileManagerFactory
     public static function create(FileCreateDTO $fileCreateDTO): ?Files
     {
         /**
-         * @var $service iFileManagerServices
+         * @var $service fileServiceInterface
          */
-        $service = Yii::$container->get(iFileManagerServices::class);
+        $service = Yii::$container->get(FileServiceInterface::class);
 
         if(mb_strlen($fileCreateDTO->title) == 0){
             $fileCreateDTO->title = $fileCreateDTO->name;
@@ -56,7 +56,7 @@ class FileManagerFactory extends Component implements iFileManagerFactory
         ]);
 
         if(!$file->save()){
-            throw new FileManagerExceptions(current($file->getErrors())[0]);
+            throw new FileException(current($file->getErrors())[0]);
         }
 
         return $file;

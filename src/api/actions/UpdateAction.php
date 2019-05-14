@@ -2,7 +2,7 @@
 
 namespace jakharbek\filemanager\api\actions;
 
-use jakharbek\filemanager\exceptions\FileManagerExceptions;
+use jakharbek\filemanager\exceptions\FileException;
 use jakharbek\filemanager\forms\UpdateFileForm;
 use jakharbek\filemanager\forms\UploadFilesForm;
 use Yii;

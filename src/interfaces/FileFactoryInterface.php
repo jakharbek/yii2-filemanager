@@ -8,7 +8,7 @@ use jakharbek\filemanager\models\Files;
  * Interface iFileManagerFactory
  * @package jakharbek\filemanager\interfaces
  */
-interface iFileManagerFactory
+interface FileFactoryInterface
 {
     /**
      * @param FileCreateDTO $fileCreateDTO

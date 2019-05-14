@@ -4,7 +4,7 @@ namespace jakharbek\filemanager\interfaces;
 
 use jakharbek\filemanager\models\Files;
 
-interface iFileManagerRepository
+interface FileRepositoryInterface
 {
     /**
      * @param $id

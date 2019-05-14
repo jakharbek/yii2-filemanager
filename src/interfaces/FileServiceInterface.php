@@ -13,7 +13,7 @@ use jakharbek\filemanager\models\Files;
  * Interface iFileManagerServices
  * @package jakharbek\filemanager\interfaces
  */
-interface iFileManagerServices
+interface FileServiceInterface
 {
     /**
      * @param FileUploadDTO $fileUploadDTO

@@ -2,7 +2,7 @@
 
 namespace jakharbek\filemanager\forms;
 
-use jakharbek\filemanager\interfaces\iFileManagerRepository;
+use jakharbek\filemanager\interfaces\FileRepositoryInterface;
 use jakharbek\filemanager\models\Files;
 use Yii;
 use yii\base\Model;
@@ -23,9 +23,9 @@ class UpdateFileForm extends Model
     public function init()
     {
         /**
-         * @var $repository iFileManagerRepository
+         * @var $repository FileRepositoryInterface
          */
-        $repository = Yii::$container->get(iFileManagerRepository::class);
+        $repository = Yii::$container->get(FileRepositoryInterface::class);
         $this->file = $repository->getById($this->file_id);
         parent::init();
     }

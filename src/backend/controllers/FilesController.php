@@ -3,10 +3,7 @@
 namespace jakharbek\filemanager\backend\controllers;
 
 use jakharbek\filemanager\api\actions\UploadAction;
-use jakharbek\filemanager\behaviors\FileRelationBehavior;
-use jakharbek\filemanager\exceptions\FileManagerExceptions;
 use jakharbek\filemanager\forms\UpdateFileForm;
-use jakharbek\filemanager\forms\UploadFilesForm;
 use jakharbek\filemanager\models\Files;
 use jakharbek\filemanager\models\FilesSearch;
 use Yii;
@@ -14,7 +11,6 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
 
 /**
  * FilesController implements the CRUD actions for Files model.

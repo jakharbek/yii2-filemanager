@@ -13,7 +13,7 @@ use yii\rest\Controller;
  * Class FileManagerController
  * @package jakharbek\filemanager\api
  */
-class FileManagerController extends Controller
+class FilesController extends Controller
 {
     /**
      * @return array

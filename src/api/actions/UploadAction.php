@@ -2,7 +2,7 @@
 
 namespace jakharbek\filemanager\api\actions;
 
-use jakharbek\filemanager\exceptions\FileManagerExceptions;
+use jakharbek\filemanager\exceptions\FileException;
 use jakharbek\filemanager\forms\UploadFilesForm;
 use jakharbek\filemanager\models\Files;
 use Yii;
@@ -23,14 +23,14 @@ class UploadAction extends Action
 
     /**
      * @return bool|UploadFilesForm
-     * @throws FileManagerExceptions
+     * @throws FileException
      */
     public function run()
     {
         $model = new UploadFilesForm(['extensions' => $this->extensions, 'maxFiles' => $this->maxFiles]);
 
         if (!Yii::$app->request->isPost) {
-            throw new FileManagerExceptions("Method is not POST");
+            throw new FileException("Method is not POST");
         }
 
 

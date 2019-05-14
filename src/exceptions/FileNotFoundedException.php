@@ -1,7 +1,7 @@
 <?php
 namespace jakharbek\filemanager\exceptions;
 
-class FileNotFoundedException extends FileManagerExceptions
+class FileNotFoundedException extends FileException
 {
 
 }
