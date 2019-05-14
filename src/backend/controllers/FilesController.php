@@ -164,29 +164,4 @@ class FilesController extends Controller
 
         return ['output' => $data];
     }
-
-    public function actionUasdpload()
-    {
-        print_r(Yii::$app->request->post());
-        print_r(Yii::$app->request->get());
-        print_r($_FILES);
-        exit();
-        $model = new UploadFilesForm(['extensions' => $this->extensions, 'maxFiles' => $this->maxFiles]);
-
-        if (!Yii::$app->request->isPost) {
-            throw new FileManagerExceptions("Method is not POST");
-        }
-
-        $model->files = UploadedFile::getInstancesByName($this->attribute);
-
-        /**
-         * @var $files Files[]
-         */
-        if (!$files = $model->upload()) {
-            Yii::$app->response->statusCode = 400;
-            return $model;
-        }
-
-        return $files;
-    }
 }

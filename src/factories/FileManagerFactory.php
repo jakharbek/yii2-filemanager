@@ -28,10 +28,10 @@ class FileManagerFactory extends Component implements iFileManagerFactory
          */
         $service = Yii::$container->get(iFileManagerServices::class);
 
-        if(strlen($fileCreateDTO->title) == 0){
+        if(mb_strlen($fileCreateDTO->title) == 0){
             $fileCreateDTO->title = $fileCreateDTO->name;
         }
-        if(strlen($fileCreateDTO->description) == 0){
+        if(mb_strlen($fileCreateDTO->description) == 0){
             $fileCreateDTO->description = $fileCreateDTO->name;
         }
 
