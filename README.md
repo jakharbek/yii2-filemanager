@@ -36,6 +36,16 @@ You need to do the migration
 yii migrate --migrationPath=@vendor/jakharbek/yii2-filemanager/src/migrations
 ```
 
+Module
+-----
+You need to connect the module of the backend part app.`\jakharbek\filemanager\backend\Module`
+
+
+```php
+'modules' => [
+    'files' => \jakharbek\filemanager\backend\Module::class
+],
+```
 Params
 -----
 
@@ -91,7 +101,7 @@ Params
  
  Apply DI (dependency injection)
  -----
-There is a class Johar you need to apply it to the initial download of the application as an example.
+There is a class `\jakharbek\filemanager\bootstrap\setUp` you need to apply it to the initial download of the application as an example.
 ```php
 'bootstrap' => [
     \jakharbek\filemanager\bootstrap\setUp::class
@@ -225,3 +235,10 @@ Helpers
 -----------
 You have to help the class jakharbek\filemanager\helpers\FileManagerHelper
 There is one method that you will often use in my opinion:`FileManagerHelper::getFilesById`
+
+
+API
+-----------
+The extension has an API, you can connect it and get access to the file manager via the API 
+`jakharbek\filemanager\api\FileManagerController` <br />
+If you need an action of this controller, you can use them by looking at the action method of this class.
