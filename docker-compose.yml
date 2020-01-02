@@ -1,0 +1,10 @@
+version: '3.2'
+
+services:
+  console:
+    image: yiisoftware/yii2-php:7.2-apache
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app

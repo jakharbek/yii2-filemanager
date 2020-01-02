@@ -29,6 +29,6 @@ class createThumbnailsJob extends BaseObject implements \yii\queue\JobInterface
         $repository = Yii::$container->get(fileRepositoryInterface::class);
         $file = $repository->getById($this->file_id);
         echo $this->file_id."\n";
-        $service->createThumbsImage($file);
+        $service->createThumbsImageByFile($file);
     }
 }

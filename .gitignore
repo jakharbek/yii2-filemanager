@@ -1,2 +1,4 @@
 .idea
 .git
+/src/.phpunit.result.cache
+/composer.lock

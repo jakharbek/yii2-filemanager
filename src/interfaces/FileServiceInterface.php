@@ -34,9 +34,17 @@ interface FileServiceInterface
     public function generatePath(GeneratePathFileDTO $generatePathFileDTO): GeneratedPathFileDTO;
 
     /**
-     * @param Files $file
-     * @return bool
+     * @param $origin
+     * @param $dist
+     * @return bool|null
      */
-    public function createThumbsImage(Files $file): ?bool;
+    public function createThumbsImage($origin, $path, string $file, $ext): ?bool;
+
+    /**
+     * @param Files $file
+     * @return bool|null
+     */
+    public function createThumbsImageByFile(Files $file): ?bool;
+
 
 }

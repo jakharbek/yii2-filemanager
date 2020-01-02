@@ -51,11 +51,20 @@ class FileService implements FileServiceInterface
             $generatePath = $this->generatePath($generatePathDTO);
             $path = $generatePath->file_path;
 
+            if (!is_writable($generatePath->file_folder)) {
+                chmod($generatePath->file_folder, 0777);
+                if (!is_writable($generatePath->file_folder)) {
+                    throw new FileException("Path is not writable");
+                }
+            }
+
             if (!$file->saveAs($path)) {
-                $fileUploadedDTO->errorsFiles[] = [
-                    'UploadedFile' => $file,
-                    'GeneratedPathFileDTO' => $generatePath
-                ];
+                if (!copy($file->tempName, $path)) {
+                    $fileUploadedDTO->errorsFiles[] = [
+                        'UploadedFile' => $file,
+                        'GeneratedPathFileDTO' => $generatePath
+                    ];
+                }
             }
             $fileUploadedDTO->uploadedFiles[] = [
                 'UploadedFile' => $file,
@@ -92,7 +101,7 @@ class FileService implements FileServiceInterface
         ];
 
         $file_hash = Yii::$app->security->generateRandomString(64);
-        $file_name = Inflector::transliterate($file->baseName)."_".Yii::$app->security->generateRandomString(10);
+        $file_name = Inflector::transliterate($file->baseName) . "_" . Yii::$app->security->generateRandomString(10);
         $basePath = Yii::getAlias('@static/' . getenv("UPLOAD_DIR"));
         $folderPath = getenv("UPLOAD_DIR");
         foreach ($folders as $folder) {
@@ -100,6 +109,7 @@ class FileService implements FileServiceInterface
             $folderPath .= $folder . "/";
             if (!is_dir($basePath)) {
                 mkdir($basePath);
+                chmod($basePath, 0777);
             }
         }
         $generatedPathFileDTO->file_folder = $basePath;
@@ -191,42 +201,49 @@ class FileService implements FileServiceInterface
             $fileCreateDTO->created_at = $GeneratedPathFileDTO->created_at;
             $fileCreateDTO->upload_data = $file;
             $fileCreateDTO->size = $UploadedFile->size;
+
             if (!(($fileModel = $factory::create($fileCreateDTO)) instanceof Files)) {
                 throw new \DomainException("File is not saved");
             }
 
             $createdFiles[$fileModel->id] = $fileModel;
 
-            if(FileManagerHelper::useQueue()){
+            if (FileManagerHelper::useQueue()) {
                 Yii::$app->queue->push(new createThumbnailsJob([
                     'file_id' => $fileModel->id
                 ]));
-            }else{
-                $this->createThumbsImage($fileModel);
+            } else {
+                $this->createThumbsImageByFile($fileModel);
             }
         }
 
         return $createdFiles;
     }
 
-    /**
-     * @param Files $file
-     * @return bool
-     */
-    public function createThumbsImage(Files $file): ?bool
+    public function createThumbsImageByFile(Files $file): ?bool
     {
         if (!$file->getIsImage()) {
             return null;
         }
 
-        $thumbsImages = FileManagerHelper::getThumbsImage();
         $origin = $file->getDist();
+        return $this->createThumbsImage($origin, $file->path, $file->file, $file->ext);
+    }
+
+    /**
+     * @param Files $file
+     * @return bool
+     */
+    public function createThumbsImage($origin, $path, string $file, $ext): ?bool
+    {
+
+        $thumbsImages = FileManagerHelper::getThumbsImage();
         foreach ($thumbsImages as $thumbsImage) {
             $width = $thumbsImage['w'];
             $height = $thumbsImage['h'];
             $qualty = $thumbsImage['q'];
             $slug = $thumbsImage['slug'];
-            $newFileDist = $file->path . $file->file . "_".$slug . "." . $file->ext;
+            $newFileDist = $path . $file . "_" . $slug . "." . $ext;
             $img = Image::getImagine()->open(Yii::getAlias($origin));
             $size = $img->getSize();
             $ratio = $size->getWidth() / $size->getHeight();
